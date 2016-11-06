@@ -9,17 +9,23 @@ namespace hammer_backstock
 {
     class Program
     {
-        [Option('n', "Custom", Required = false, HelpText = "Configuration name")]
+        [Option('n', DefaultValue = "Custom", Required = false, HelpText = "Configuration name")]
         public string myName { get; set; }
 
-        [Option('s', "CmdSeq_custom.wc", Required = false, HelpText = "Command Sequence")]
+        [Option('s', DefaultValue = "CmdSeq_custom.wc", Required = false, HelpText = "Command Sequence")]
         public string wcFile { get; set; }
 
-        [Option('c', "GameConfig_custom.txt", Required = false, HelpText = "Config file")]
+        [Option('c', DefaultValue = "GameConfig_custom.txt", Required = false, HelpText = "Config file")]
         public string gameConfigFile { get; set; }
 
-        [Option('e', "hammer.exe", Required = false, HelpText = "Hammer executable")]
+        [Option('e', DefaultValue = "hammer.exe", Required = false, HelpText = "Hammer executable")]
         public string hammerExe { get; set; }
+
+        [Option('d', DefaultValue = "", Required = false, HelpText = "Current Directory")]
+        public string currentDirectory { get; set; }
+
+        [Option('b', DefaultValue = "", Required = false, HelpText = "Binary Directory")]
+        public string binDirectory { get; set; }
 
 
         static void Main(string[] args)
@@ -53,33 +59,36 @@ namespace hammer_backstock
                 }
 
                 // Move configurations into place
-                if (File.Exists("CmdSeq.wc")) File.Copy("CmdSeq.wc", "CmdSeq_original.wc", true);
-                if (File.Exists("CmdSeq_backstock.wc")) File.Copy(this.wcFile, "CmdSeq.wc", true);
+                if (File.Exists(this.binDirectory + "CmdSeq.wc")) File.Copy(this.binDirectory + "CmdSeq.wc", this.binDirectory + "CmdSeq_original.wc", true);
+                if (File.Exists(this.currentDirectory + wcFile)) File.Copy(this.currentDirectory + this.wcFile, this.binDirectory + "CmdSeq.wc", true);
 
-                if (File.Exists("GameConfig.txt")) File.Copy("GameConfig.txt", "GameConfig_original.txt", true);
-                if (File.Exists(gameConfigFile)) File.Copy(this.gameConfigFile, "GameConfig.txt", true);
+                if (File.Exists(this.binDirectory + "GameConfig.txt")) File.Copy(this.binDirectory + "GameConfig.txt", this.binDirectory + "GameConfig_original.txt", true);
+                if (File.Exists(this.currentDirectory + gameConfigFile)) File.Copy(this.currentDirectory + this.gameConfigFile, this.binDirectory + "GameConfig.txt", true);
 
                 //Start hammer
                 var ccTagIntermediateCompilerProcess = new Process();
-                ccTagIntermediateCompilerProcess.StartInfo.FileName = hammerExe;
+
+                Console.WriteLine(this.binDirectory + hammerExe);
+
+                ccTagIntermediateCompilerProcess.StartInfo.FileName = this.binDirectory + hammerExe;
                 ccTagIntermediateCompilerProcess.StartInfo.Arguments = "-nop4";
                 ccTagIntermediateCompilerProcess.Start();
                 ccTagIntermediateCompilerProcess.WaitForExit();
 
                 // Restore original configurations
 
-                if (File.Exists("CmdSeq.wc")) File.Copy("CmdSeq.wc", wcFile, true);
-                if (File.Exists("CmdSeq_original.wc"))
+                if (File.Exists(this.binDirectory + "CmdSeq.wc")) File.Copy(this.binDirectory + "CmdSeq.wc", this.currentDirectory + wcFile, true);
+                if (File.Exists(this.binDirectory + "CmdSeq_original.wc"))
                 {
-                    File.Copy("CmdSeq_original.wc", "CmdSeq.wc", true);
-                    File.Delete("CmdSeq_original.wc");
+                    File.Copy(this.binDirectory + "CmdSeq_original.wc", this.binDirectory + "CmdSeq.wc", true);
+                    File.Delete(this.binDirectory + "CmdSeq_original.wc");
                 }
 
-                if (File.Exists("GameConfig.txt")) File.Copy("GameConfig.txt", this.gameConfigFile, true);
-                if (File.Exists("GameConfig_original.txt"))
+                if (File.Exists(this.binDirectory + "GameConfig.txt")) File.Copy(this.binDirectory + "GameConfig.txt", this.currentDirectory + this.gameConfigFile, true);
+                if (File.Exists(this.binDirectory + "GameConfig_original.txt"))
                 {
-                    File.Copy("GameConfig_original.txt", "GameConfig.txt", true);
-                    File.Delete("GameConfig_original.txt");
+                    File.Copy(this.binDirectory + "GameConfig_original.txt", this.binDirectory + "GameConfig.txt", true);
+                    File.Delete(this.binDirectory + "GameConfig_original.txt");
                 }
             }
             catch (Exception ex)
