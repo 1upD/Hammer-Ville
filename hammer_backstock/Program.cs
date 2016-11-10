@@ -68,9 +68,8 @@ namespace hammer_backstock
                 //Start hammer
                 var ccTagIntermediateCompilerProcess = new Process();
 
-                Console.WriteLine(this.binDirectory + hammerExe);
-
-                ccTagIntermediateCompilerProcess.StartInfo.FileName = this.binDirectory + hammerExe;
+                ccTagIntermediateCompilerProcess.StartInfo.WorkingDirectory = Path.Combine(Directory.GetCurrentDirectory(), this.binDirectory.Replace('/', '\\'));
+                ccTagIntermediateCompilerProcess.StartInfo.FileName =  hammerExe;
                 ccTagIntermediateCompilerProcess.StartInfo.Arguments = "-nop4";
                 ccTagIntermediateCompilerProcess.Start();
                 ccTagIntermediateCompilerProcess.WaitForExit();

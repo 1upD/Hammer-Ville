@@ -27,5 +27,7 @@
 				"MaterialExcludeCount"		"0"
 			}
 		}
+		"SDKVersion"		"5"
+	}
 	"SDKVersion"		"5"
 }
